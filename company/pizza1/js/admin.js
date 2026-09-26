@@ -8,6 +8,7 @@ const TELEFONE_RESTAURANTE = "5585987608107";
 let somPermitido = false;
 let qtdPendentesAnterior = null;
 
+// FUNÇÕES DO HEADER LIGADAS AO WINDOW
 window.toggleSom = function() {
     somPermitido = !somPermitido;
     const btn = document.getElementById('btn-som');
@@ -20,6 +21,18 @@ window.toggleSom = function() {
             btn.style.background = '#f59e0b';
             btn.textContent = '🔕 Som Desativado';
         }
+    }
+};
+
+window.fazerLogout = function() {
+    sessionStorage.removeItem('exclivo_autenticado');
+    window.location.href = 'login.html';
+};
+
+window.limparHistorico = function() {
+    if (confirm('Atenção: Os pedidos são geridos no Firebase. Deseja limpar a visualização local?')) {
+        const container = document.getElementById('orders-list');
+        if (container) container.innerHTML = '<p class="no-orders">Nenhum pedido recebido ainda.</p>';
     }
 };
 
@@ -40,26 +53,10 @@ function tocarCampainha() {
         gain1.connect(ctx.destination);
         osc1.start(ctx.currentTime);
         osc1.stop(ctx.currentTime + 0.3);
-
-        const osc2 = ctx.createOscillator();
-        const gain2 = ctx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(1200, ctx.currentTime + 0.2);
-        gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.2);
-        gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
-        osc2.connect(gain2);
-        gain2.connect(ctx.destination);
-        osc2.start(ctx.currentTime + 0.2);
-        osc2.stop(ctx.currentTime + 0.6);
     } catch (e) {
         console.error("Erro ao tocar áudio:", e);
     }
 }
-
-window.fazerLogout = function() {
-    sessionStorage.removeItem('exclivo_autenticado');
-    window.location.href = 'login.html';
-};
 
 window.confirmarPedido = async function(idDoc) {
     await atualizarStatusPedido(idDoc, 'preparo');
@@ -152,7 +149,7 @@ function carregarPedidos(pedidos) {
         }
 
         const totalExibicao = (pedido.total || 0).toFixed(2).replace('.', ',');
-        const idDoc = pedido.idDoc; // ID único do documento gerado no Firestore
+        const idDoc = pedido.idDoc;
 
         let acoesConfirmacaoHTML = '';
         if (statusAtual === 'pendente') {
@@ -235,7 +232,6 @@ function atualizarEstatisticas(pedidos) {
     if (elFaturamento) elFaturamento.textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
 }
 
-// INICIALIZAÇÃO OUVINDO O FIRESTORE EM TEMPO REAL
 document.addEventListener('DOMContentLoaded', () => {
     escutarPedidosEmTempoReal((pedidos) => {
         carregarPedidos(pedidos);
