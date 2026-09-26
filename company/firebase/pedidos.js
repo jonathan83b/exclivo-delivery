@@ -12,6 +12,9 @@ import {
 
 const COLECAO_PEDIDOS = 'pizza1_pedidos';
 
+/**
+ * Cria um novo pedido no Firestore
+ */
 export async function criarPedido(novoPedido) {
     try {
         const docRef = await addDoc(collection(db, COLECAO_PEDIDOS), novoPedido);
@@ -22,6 +25,9 @@ export async function criarPedido(novoPedido) {
     }
 }
 
+/**
+ * Busca todos os pedidos uma única vez
+ */
 export async function buscarPedidos() {
     try {
         const q = query(collection(db, COLECAO_PEDIDOS), orderBy('dataCriacao', 'desc'));
@@ -37,6 +43,9 @@ export async function buscarPedidos() {
     }
 }
 
+/**
+ * Ouve alterações em tempo real nos pedidos para atualizar a cozinha instantaneamente
+ */
 export function escutarPedidosEmTempoReal(callback) {
     const q = query(collection(db, COLECAO_PEDIDOS), orderBy('dataCriacao', 'desc'));
     return onSnapshot(q, (querySnapshot) => {
@@ -48,6 +57,9 @@ export function escutarPedidosEmTempoReal(callback) {
     });
 }
 
+/**
+ * Atualiza o status de um pedido específico no Firestore
+ */
 export async function atualizarStatusPedido(idDoc, novoStatus, motivo = '') {
     try {
         const pedidoRef = doc(db, COLECAO_PEDIDOS, idDoc);
