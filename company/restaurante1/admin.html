@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrador - Restaurante</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              400: '#fb923c',
+              500: '#f97316',
+              600: '#ea580c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- FontAwesome Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Estilos do Admin na Raiz -->
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+
+  <!-- CABEÇALHO / NAVBAR -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500 font-black text-lg shadow-lg">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div>
+          <h1 id="header-nome-loja" class="text-base font-extrabold text-white leading-none">Restaurante</h1>
+          <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Painel de Gestão e Relatórios</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="hidden sm:flex items-center space-x-3 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl">
+          <div class="w-7 h-7 rounded-lg bg-brand-500 text-white font-bold text-xs flex items-center justify-center">
+            <i class="fa-solid fa-user-shield text-xs"></i>
+          </div>
+          <div class="text-left">
+            <p id="admin-user-name" class="text-xs font-bold text-white leading-tight">Administrador</p>
+            <span class="text-[9px] text-emerald-400 font-bold uppercase">Sessão Ativa</span>
+          </div>
+        </div>
+
+        <button id="btn-logout" class="bg-rose-600/10 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/20 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-sm" title="Sair da Conta">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="hidden sm:inline">Sair</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- BANNER DE DASHBOARD / BI AVANÇADO -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Card Faturamento -->
+      <div class="dash-card bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-xl">
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Faturamento Total</p>
+          <h2 id="dash-admin-faturamento" class="text-2xl font-black text-emerald-400 mt-0.5">R$ 0,00</h2>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg font-bold">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+      </div>
+
+      <!-- Card Total de Pedidos -->
+      <div class="dash-card bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-xl">
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pedidos Concluídos</p>
+          <h2 id="dash-admin-pedidos" class="text-2xl font-black text-white mt-0.5">0</h2>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 text-lg font-bold">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+      </div>
+
+      <!-- Card: Ticket Médio -->
+      <div class="dash-card bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-xl">
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Ticket Médio / Mesa</p>
+          <h2 id="dash-admin-ticket-medio" class="text-2xl font-black text-blue-400 mt-0.5">R$ 0,00</h2>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-lg font-bold">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+      </div>
+
+      <!-- Card: Campeão de Vendas -->
+      <div class="dash-card bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-xl">
+        <div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Prato mais Pedido</p>
+          <h2 id="dash-admin-prato-top" class="text-xs font-bold text-amber-300 mt-1 line-clamp-2">Sem vendas</h2>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-lg font-bold">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SEÇÃO: GERENCIAMENTO DE CARDÁPIO RETRÁTIL (ACORDEÃO) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      
+      <!-- Cabeçalho Clicável para Recolher/Expandir -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer select-none" onclick="toggleSecaoCardapio()">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 font-bold text-xl">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-extrabold text-white">Gestão de Cardápio e Pratos</h2>
+            <p class="text-xs text-slate-400">Cadastre novos itens, edite preços, insira imagens e gerencie a disponibilidade.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+          <!-- Botão de cadastrar mantido sem fechar o menu ao clicar -->
+          <button onclick="event.stopPropagation(); abrirModalPrato()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-2 shadow-lg shadow-brand-500/20">
+            <i class="fa-solid fa-plus"></i> Cadastrar Novo Prato
+          </button>
+          
+          <!-- Ícone de rotação da seta -->
+          <div class="w-8 h-8 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400">
+            <i id="icone-toggle-cardapio" class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conteúdo Colapsável (Grelha de Pratos) -->
+      <div id="conteudo-cardapio-colapsavel" class="pt-4 border-t border-slate-800 transition-all">
+        <div id="container-cardapio-admin" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- Os cartões dos pratos são injetados aqui automaticamente pelo admin.js -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SEÇÃO: PASTA DE CLIENTES (CRM) -->
+    <section class="p-6 bg-slate-900 border border-slate-800 rounded-3xl space-y-4 shadow-2xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-black text-white flex items-center gap-2">
+            <i class="fa-solid fa-folder-open text-brand-400"></i>
+            <span>Pasta e Histórico de Clientes (CRM)</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">Acompanhe a frequência de visitas, gasto acumulado e preferências de consumo de cada cliente.</p>
+        </div>
+
+        <button onclick="exportarPastaClientesCSV()" class="btn-exportar-excel bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-lg">
+          <i class="fa-solid fa-file-excel text-sm"></i>
+          <span>Exportar Pasta para Excel</span>
+        </button>
+      </div>
+
+      <div id="container-pasta-clientes-admin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: CADASTRAR / EDITAR PRATO -->
+  <div id="modal-prato" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+      
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 id="modal-prato-titulo" class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-brand-400"></i> Cadastrar Prato
+        </h3>
+        <button onclick="fecharModalPrato()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="form-prato" onsubmit="salvarPrato(event)" class="space-y-3">
+        <input type="hidden" id="prato-id">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Nome do Prato *</label>
+          <input type="text" id="prato-nome" required placeholder="Ex: Hambúrguer Artesanal" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Categoria *</label>
+            <select id="prato-categoria" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-500 focus:outline-none">
+              <option value="Pratos Principais">Pratos Principais</option>
+              <option value="Entradas">Entradas</option>
+              <option value="Bebidas">Bebidas</option>
+              <option value="Sobremesas">Sobremesas</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Preço (R$) *</label>
+            <input type="number" step="0.01" id="prato-preco" required placeholder="29.90" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Descrição</label>
+          <textarea id="prato-desc" rows="2" placeholder="Ingredientes e detalhes..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-500 focus:outline-none"></textarea>
+        </div>
+
+        <!-- Upload de Imagem ou URL -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Imagem do Prato</label>
+          <div class="space-y-2">
+            <input type="file" id="prato-file" accept="image/*" onchange="converterImagemBase64(this)" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-500/10 file:text-brand-400 hover:file:bg-brand-500/20 cursor-pointer">
+            <input type="url" id="prato-image" placeholder="Ou cole a URL da imagem (http://...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-brand-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div id="preview-container" class="hidden text-center pt-1">
+          <p class="text-[10px] text-slate-500 mb-1">Pré-visualização:</p>
+          <img id="prato-preview" src="" class="w-20 h-20 object-cover rounded-xl mx-auto border border-slate-800">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="fecharModalPrato()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded-xl shadow-lg">Salvar Prato</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Script do Admin na Raiz -->
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

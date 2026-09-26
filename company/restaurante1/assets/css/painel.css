@@ -1,0 +1,28 @@
+/* Estilos gerais para a área restrita / painel da equipe */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Animações e efeitos dos cartões de seleção de perfil */
+.role-card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.role-card:hover {
+  transform: translateY(-2px);
+}
+
+.role-card.active {
+  border-color: #f97316;
+  background-color: rgba(249, 115, 22, 0.1);
+}
+
+/* Transição do fundo dos botões */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:active {
+  transform: scale(0.98);
+}

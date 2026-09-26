@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Pedidos - Exclivo Delivery</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+
+    <header class="admin-header">
+    <h1>EXCLIVO - Painel do Restaurante</h1>
+    <div class="admin-actions">
+        <!-- BOTÃO PARA ATIVAR NOTIFICAÇÕES SONORAS -->
+        <button id="btn-som" style="background: #f59e0b; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="toggleSom()">🔔 Ativar Som</button>
+        
+        <!-- BOTÃO DE GERENCIAR CARDÁPIO DENTRO DO GRUPO -->
+        <a href="gerenciar-cardapio.html" class="btn-site" style="background: #3b82f6;">🍔 Gerenciar Cardápio</a>
+
+        <button class="btn-clear" onclick="limparHistorico()">Limpar Histórico</button>
+        <a href="index.html" class="btn-site" target="_blank">Abrir Cardápio</a>
+        <button style="background: #64748b; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="fazerLogout()">🚪 Sair</button>
+    </div>
+</header>
+
+    <main class="admin-container">
+
+        <!-- Métricas Rápidas -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h3>Total de Pedidos</h3>
+                <span id="stat-total-pedidos">0</span>
+            </div>
+            <div class="stat-card warning">
+                <h3>Aguardando Confirmação</h3>
+                <span id="stat-pendentes">0</span>
+            </div>
+            <div class="stat-card info">
+                <h3>Em Preparo / Confirmados</h3>
+                <span id="stat-preparo">0</span>
+            </div>
+            <div class="stat-card success">
+                <h3>Faturamento Confirmado</h3>
+                <span id="stat-faturamento">R$ 0,00</span>
+            </div>
+        </section>
+
+        <!-- Lista de Pedidos -->
+        <section class="orders-section">
+            <h2>📦 Gestão e Confirmação de Pedidos</h2>
+
+            <div id="orders-list" class="orders-list">
+                <p class="no-orders">Nenhum pedido recebido ainda.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

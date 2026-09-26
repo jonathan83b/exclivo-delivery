@@ -1,0 +1,33 @@
+/* Estilos e animações do Cardápio Restaurante */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes pulse-ring {
+  0% { 
+    transform: scale(0.95); 
+    opacity: 0.8; 
+  }
+  50% { 
+    transform: scale(1.03); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: scale(0.95); 
+    opacity: 0.8; 
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s infinite ease-in-out;
+}

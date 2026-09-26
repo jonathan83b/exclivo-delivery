@@ -1,0 +1,19 @@
+/* ==========================================================================
+   ESTILOS DO CATÁLOGO DE PRODUTOS
+   ========================================================================== */
+
+/* Ajustes gerais de scroll e seleção */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #020617; /* slate-950 */
+  color: #f8fafc; /* slate-50 */
+}
+
+/* Esconder barras de scroll indesejadas mantendo a funcionalidade */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzaria João - Delivery</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="img/favcompizza.png" type="image/png">
+</head>
+
+<body>
+
+    <!-- BOTÃO PARA ABRIR O MENU LATERAL -->
+    <button type="button" class="btn-menu-lateral" onclick="toggleSidebar()">☰</button>
+
+    <!-- SOBREPOSIÇÃO (ESCURINHO DE FUNDO AO ABRIR) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- GAVETA LATERAL / SIDEBAR -->
+    <aside class="sidebar-container" id="sidebar-container">
+        <div class="sidebar-header">
+            <h3>⚡ Menu </h3>
+            <button type="button" class="btn-fechar-sidebar" onclick="toggleSidebar()">✕</button>
+        </div>
+
+        <nav class="sidebar-links">
+            <!-- <a href="index.html" class="sidebar-item">🍕 Ver Cardápio</a>
+            <a href="admin.html" class="sidebar-item">📦 Painel de Pedidos (Admin)</a>
+            <a href="gerenciar-cardapio.html" class="sidebar-item">🍔 Gerenciar Produtos</a> -->
+            <a href="https://wa.me/5585987608107" target="_blank" class="sidebar-item">💬 Falar com Atendimento</a>
+            <a href="login.html" class="sidebar-item warning">🔑 Área Restrita / Login</a>
+            
+        </nav>
+
+        <div class="sidebar-footer">
+            <small>Exclivo Delivery v1.0</small><br>
+            <small><a href="/home/index.html">Sobre</a></small>
+        </div>
+    </aside>
+
+    <header>
+        <h1>Pizzaria João</h1>
+        <p>Delivery</p>
+        
+    </header>
+
+    <main class="container">
+
+        <section class="restaurant">
+            <h2>🍕 Pizzaria do João</h2>
+            <p>Pizza, bebidas e muito mais</p>
+            <p class="horario-info">⏰ Terça a Domingo • 17:00 às 23:30</p>
+            <p class="status" id="status-loja">● Carregando status...</p>
+        </section>
+
+        <!-- NAVEGAÇÃO / FILTRO DE CATEGORIAS -->
+        <nav class="categories-nav">
+            <button type="button" class="category-btn active" onclick="filtrarCategoria('todas', this)">✨ Todas</button>
+            <button type="button" class="category-btn" onclick="filtrarCategoria('pizzas', this)">🍕 Pizzas</button>
+            <button type="button" class="category-btn" onclick="filtrarCategoria('bebidas', this)">🥤 Bebidas</button>
+            <button type="button" class="category-btn" onclick="filtrarCategoria('sobremesas', this)">🍰 Sobremesas</button>
+            <button type="button" class="category-btn" onclick="filtrarCategoria('hamburgueres', this)">🍔 Hambúrgueres</button>
+        </nav>
+        </nav>
+
+        <!-- LISTA DE PRODUTOS -->
+        <section class="products">
+
+            <!-- PIZZAS -->
+            <div class="product" data-categoria="pizzas">
+                <h3>Pizza Calabresa</h3>
+                <p>Molho de tomate, queijo e calabresa.</p>
+                
+                <div class="product-option">
+                    <label for="borda-calabresa"><strong>Borda:</strong></label>
+                    <select id="borda-calabresa">
+                        <option value="0" data-nome="">Sem Borda Recheada</option>
+                        <option value="8" data-nome="Borda Catupiry">Borda Catupiry (+ R$ 8,00)</option>
+                        <option value="8" data-nome="Borda Cheddar">Borda Cheddar (+ R$ 8,00)</option>
+                        <option value="10" data-nome="Borda Chocolate">Borda Chocolate (+ R$ 10,00)</option>
+                    </select>
+                </div>
+
+                <div class="price">R$ 35,00</div>
+                <button type="button" onclick="adicionarPizza('Pizza Calabresa', 35, 'borda-calabresa')">
+                    Adicionar
+                </button>
+            </div>
+
+            <div class="product" data-categoria="pizzas">
+                <h3>Pizza Frango</h3>
+                <p>Molho de tomate, queijo e frango.</p>
+                
+                <div class="product-option">
+                    <label for="borda-frango"><strong>Borda:</strong></label>
+                    <select id="borda-frango">
+                        <option value="0" data-nome="">Sem Borda Recheada</option>
+                        <option value="8" data-nome="Borda Catupiry">Borda Catupiry (+ R$ 8,00)</option>
+                        <option value="8" data-nome="Borda Cheddar">Borda Cheddar (+ R$ 8,00)</option>
+                        <option value="10" data-nome="Borda Chocolate">Borda Chocolate (+ R$ 10,00)</option>
+                    </select>
+                </div>
+
+                <div class="price">R$ 38,00</div>
+                <button type="button" onclick="adicionarPizza('Pizza Frango', 38, 'borda-frango')">
+                    Adicionar
+                </button>
+            </div>
+
+            <div class="product" data-categoria="pizzas">
+                <h3>Pizza Portuguesa</h3>
+                <p>Queijo, presunto, ovo, cebola e tomate.</p>
+                
+                <div class="product-option">
+                    <label for="borda-portuguesa"><strong>Borda:</strong></label>
+                    <select id="borda-portuguesa">
+                        <option value="0" data-nome="">Sem Borda Recheada</option>
+                        <option value="8" data-nome="Borda Catupiry">Borda Catupiry (+ R$ 8,00)</option>
+                        <option value="8" data-nome="Borda Cheddar">Borda Cheddar (+ R$ 8,00)</option>
+                        <option value="10" data-nome="Borda Chocolate">Borda Chocolate (+ R$ 10,00)</option>
+                    </select>
+                </div>
+
+                <div class="price">R$ 40,00</div>
+                <button type="button" onclick="adicionarPizza('Pizza Portuguesa', 40, 'borda-portuguesa')">
+                    Adicionar
+                </button>
+            </div>
+
+            <!-- BEBIDAS -->
+            <div class="product" data-categoria="bebidas">
+                <h3>Coca-Cola 2L</h3>
+                <p>Refrigerante Coca-Cola 2 litros.</p>
+                
+                <div class="product-option">
+                    <label>
+                        <input type="checkbox" id="copos-coca"> Enviar copos descartáveis
+                    </label>
+                </div>
+
+                <div class="price">R$ 12,00</div>
+                <button type="button" onclick="adicionarComOpcao('Coca-Cola 2L', 12, 'copos-coca', 'Com copos descartáveis', 0)">
+                    Adicionar
+                </button>
+            </div>
+
+        </section>
+
+        <!-- SEÇÃO DO CARRINHO -->
+        <section class="cart">
+            <h2>🛒 Seu pedido</h2>
+
+            <div id="cart-items">
+                <p class="cart-empty">Nenhum produto adicionado.</p>
+            </div>
+
+            <!-- Taxa de Entrega / Bairro -->
+            <div class="delivery-section">
+                <label for="taxa-entrega"><strong>Forma de Entrega / Bairro:</strong></label>
+                <select id="taxa-entrega" onchange="atualizarCarrinho()">
+                    <option value="0" data-nome="Retirar no local">Retirar no local (Grátis)</option>
+                    <option value="5" data-nome="Centro">Centro - R$ 5,00</option>
+                    <option value="7" data-nome="Pratius 1">Pratius 1 - R$ 7,00</option>
+                    <option value="10" data-nome="Pratius 2">Pratius 2 - R$ 10,00</option>
+                </select>
+            </div>
+
+            <!-- Endereço de Entrega Separado -->
+            <div class="address-section" id="container-endereco" style="display: none; margin-top: 15px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e9ecef;">
+                <p style="font-size: 0.9rem; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">📍 Dados para Entrega:</p>
+                
+                <div style="margin-bottom: 8px;">
+                    <label for="rua-cliente" style="font-size: 0.85rem; color: #444;"><strong>Rua / Avenida <span style="color: #e74c3c;">*</span>:</strong></label>
+                    <input type="text" id="rua-cliente" placeholder="Ex: Av. Principal" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; margin-top: 2px; outline: none; font-size: 0.9rem;">
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label for="numero-cliente" style="font-size: 0.85rem; color: #444;"><strong>Número <span style="color: #e74c3c;">*</span>:</strong></label>
+                        <input type="text" id="numero-cliente" placeholder="Ex: 123" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; margin-top: 2px; outline: none; font-size: 0.9rem;">
+                    </div>
+                    <div style="flex: 2;">
+                        <label for="referencia-cliente" style="font-size: 0.85rem; color: #444;"><strong>Ponto de Ref. / Comp.:</strong></label>
+                        <input type="text" id="referencia-cliente" placeholder="Ex: Próximo à praça" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; margin-top: 2px; outline: none; font-size: 0.9rem;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="total">
+                Total: R$ <span id="total">0,00</span>
+            </div>
+
+            <button type="button" class="order-button" onclick="fazerPedido()">
+                Fazer pedido
+            </button>
+        </section>
+
+    </main>
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurante - Painel KDS da Cozinha</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="../assets/css/painel.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+  <!-- Header Fixo KDS -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 px-4 h-16 flex items-center justify-between shadow-lg">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 font-bold text-lg">
+        <i class="fa-solid fa-fire-burner"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent leading-tight">Painel da Cozinha (KDS)</h1>
+        <p class="text-[11px] text-slate-400">Monitoramento de Pedidos em Tempo Real</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-3">
+      <!-- Botão para Gerenciar Estoque / Esgotar Pratos -->
+      <button onclick="abrirModalEstoque()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-md">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <span>Esgotar Pratos</span>
+      </button>
+
+      <span class="hidden sm:inline-block text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+        <i class="fa-solid fa-wifi text-emerald-400 mr-1.5"></i> Conectado
+      </span>
+
+      <button id="btn-logout" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-700 transition">
+        <i class="fa-solid fa-right-from-bracket mr-1"></i> Sair
+      </button>
+    </div>
+  </header>
+
+  <!-- Conteúdo Kanban da Cozinha (3 Colunas) -->
+  <main class="flex-grow p-4 md:p-6 overflow-x-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-start">
+
+      <!-- Coluna 1: Pendentes -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-4 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></div>
+            <h2 class="font-bold text-sm text-white uppercase tracking-wider">A Fazer / Pendentes</h2>
+          </div>
+          <span id="count-pendentes" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full text-xs font-extrabold">0</span>
+        </div>
+
+        <div id="col-pendentes" class="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+
+      <!-- Coluna 2: Em Preparo -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-4 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+            <h2 class="font-bold text-sm text-white uppercase tracking-wider">Em Preparo</h2>
+          </div>
+          <span id="count-preparo" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-0.5 rounded-full text-xs font-extrabold">0</span>
+        </div>
+
+        <div id="col-preparo" class="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+
+      <!-- Coluna 3: Prontos -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-4 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+            <h2 class="font-bold text-sm text-white uppercase tracking-wider">Prontos na Mesa</h2>
+          </div>
+          <span id="count-prontos" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-xs font-extrabold">0</span>
+        </div>
+
+        <div id="col-prontos" class="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Modal de Gestão de Estoque (Produtos Esgotados) -->
+  <div id="modal-gestao-estoque" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+          <i class="fa-solid fa-boxes-stacked text-amber-400"></i>
+          <span>Disponibilidade do Cardápio</span>
+        </h3>
+        <button onclick="fecharModalEstoque()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-400">Clique no produto para alternar entre <b>Disponível</b> e <b>ESGOTADO</b>. A alteração afeta o cardápio dos clientes em tempo real.</p>
+
+      <div id="lista-gestao-estoque" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+        <!-- Injetado via JS -->
+      </div>
+
+      <button onclick="fecharModalEstoque()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">
+        Concluir
+      </button>
+    </div>
+  </div>
+
+  <script src="../assets/js/cozinha.js"></script>
+</body>
+</html>

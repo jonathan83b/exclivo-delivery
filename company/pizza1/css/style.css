@@ -1,0 +1,449 @@
+/* ==========================================================================
+Exclivo Delivery - Modern & Responsive Stylesheet
+========================================================================== */
+/* --- Custom CSS Variables (Design System) --- */
+:root {
+--primary-color: #e63946;
+--primary-hover: #d62828;
+--secondary-color: #1d3557;
+--accent-color: #457b9d;
+--bg-color: #f8f9fa;
+--surface-color: #ffffff;
+--text-main: #2b2d42;
+--text-muted: #6c757d;
+--status-open: #2a9d8f;
+--border-color: #e9ecef;
+--radius-sm: 8px;
+--radius-md: 12px;
+--radius-lg: 16px;
+--radius-pill: 50px;
+--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+--transition-fast: 0.2s ease;
+--transition-normal: 0.3s ease;
+--font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+/* --- Resets & Global Styles --- */
+*, *::before, *::after {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+body {
+font-family: var(--font-family);
+background-color: var(--bg-color);
+color: var(--text-main);
+line-height: 1.6;
+-webkit-font-smoothing: antialiased;
+padding-bottom: 40px;
+}
+/* --- Header Section --- */
+header {
+background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+color: #ffffff;
+text-align: center;
+padding: 2.5rem 1rem 2rem;
+box-shadow: var(--shadow-md);
+}
+header h1 {
+font-size: 2.2rem;
+font-weight: 800;
+letter-spacing: 2px;
+text-transform: uppercase;
+margin-bottom: 0.2rem;
+}
+header p {
+font-size: 1rem;
+font-weight: 300;
+letter-spacing: 1.5px;
+text-transform: uppercase;
+opacity: 0.9;
+}
+/* --- Main Layout Container --- */
+.container {
+max-width: 1080px;
+margin: -1.5rem auto 0;
+padding: 0 1.25rem;
+display: grid;
+grid-template-columns: 1fr;
+gap: 1.5rem;
+}
+/* --- Restaurant Info Header --- */
+.restaurant {
+background-color: var(--surface-color);
+padding: 1.5rem;
+border-radius: var(--radius-md);
+box-shadow: var(--shadow-md);
+border: 1px solid var(--border-color);
+}
+.restaurant h2 {
+font-size: 1.5rem;
+color: var(--secondary-color);
+margin-bottom: 0.3rem;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+}
+.restaurant p {
+color: var(--text-muted);
+font-size: 0.95rem;
+}
+.restaurant .status {
+display: inline-flex;
+align-items: center;
+margin-top: 0.75rem;
+font-weight: 600;
+font-size: 0.85rem;
+color: var(--status-open);
+background-color: rgba(42, 157, 143, 0.1);
+padding: 0.25rem 0.75rem;
+border-radius: var(--radius-pill);
+}
+/* --- Section Titles --- */
+.menu-title {
+font-size: 1.4rem;
+color: var(--secondary-color);
+margin-top: 0.5rem;
+border-left: 4px solid var(--primary-color);
+padding-left: 0.75rem;
+}
+/* --- Products Grid --- */
+.products {
+display: grid;
+grid-template-columns: 1fr;
+gap: 1.25rem;
+}
+/* --- Product Card --- */
+.product {
+background-color: var(--surface-color);
+padding: 1.25rem;
+border-radius: var(--radius-md);
+box-shadow: var(--shadow-sm);
+border: 1px solid var(--border-color);
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.product:hover {
+transform: translateY(-3px);
+box-shadow: var(--shadow-md);
+}
+.product h3 {
+font-size: 1.15rem;
+color: var(--secondary-color);
+margin-bottom: 0.4rem;
+}
+.product p {
+color: var(--text-muted);
+font-size: 0.9rem;
+margin-bottom: 1rem;
+flex-grow: 1;
+}
+.product .price {
+font-size: 1.2rem;
+font-weight: 700;
+color: var(--primary-color);
+margin-bottom: 0.8rem;
+}
+.product button {
+width: 100%;
+padding: 0.75rem;
+background-color: var(--primary-color);
+color: #ffffff;
+border: none;
+border-radius: var(--radius-sm);
+font-size: 0.95rem;
+font-weight: 600;
+cursor: pointer;
+transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+.product button:hover {
+background-color: var(--primary-hover);
+}
+.product button:active {
+transform: scale(0.98);
+}
+/* --- Shopping Cart Section --- */
+.cart {
+background-color: var(--surface-color);
+padding: 1.5rem;
+border-radius: var(--radius-md);
+box-shadow: var(--shadow-md);
+border: 1px solid var(--border-color);
+position: sticky;
+top: 1.5rem;
+height: fit-content;
+}
+.cart h2 {
+font-size: 1.3rem;
+color: var(--secondary-color);
+margin-bottom: 1rem;
+padding-bottom: 0.5rem;
+border-bottom: 2px solid var(--bg-color);
+display: flex;
+align-items: center;
+gap: 0.5rem;
+}
+#cart-items {
+min-height: 60px;
+margin-bottom: 1rem;
+color: var(--text-muted);
+font-size: 0.95rem;
+}
+.cart-item {
+background-color: var(--bg-color);
+padding: 0.75rem;
+border-radius: var(--radius-sm);
+margin-bottom: 0.5rem !important;
+border: 1px solid var(--border-color);
+}
+.cart-item button {
+border: 1px solid var(--border-color) !important;
+background-color: var(--surface-color) !important;
+border-radius: 4px !important;
+color: var(--secondary-color) !important;
+font-weight: bold;
+transition: background-color var(--transition-fast);
+}
+.cart-item button:hover {
+background-color: #e2e8f0 !important;
+}
+.cart .total {
+font-size: 1.25rem;
+font-weight: 700;
+color: var(--secondary-color);
+margin: 1.25rem 0;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding-top: 0.75rem;
+border-top: 2px dashed var(--border-color);
+}
+.cart .total #total {
+color: var(--primary-color);
+}
+.order-button {
+width: 100%;
+padding: 0.85rem;
+background-color: var(--status-open);
+color: #ffffff;
+border: none;
+border-radius: var(--radius-sm);
+font-size: 1rem;
+font-weight: 700;
+cursor: pointer;
+transition: background-color var(--transition-fast), transform var(--transition-fast);
+box-shadow: 0 4px 10px rgba(42, 157, 143, 0.25);
+}
+.order-button:hover {
+background-color: #218376;
+}
+.order-button:active {
+transform: scale(0.98);
+}
+/* ==========================================================================
+Responsive Layout (Desktop & Tablets)
+========================================================================== */
+/* Tablet View (2 columns for products) */
+@media (min-width: 600px) {
+.products {
+grid-template-columns: repeat(2, 1fr);
+}
+}
+/* Desktop View (Sidebar Cart Layout) */
+@media (min-width: 900px) {
+.container {
+grid-template-columns: 2fr 1fr;
+align-items: start;
+grid-template-areas:
+"restaurant cart"
+"menu-title cart"
+"products cart";
+}
+.restaurant {
+grid-area: restaurant;
+}
+.menu-title {
+grid-area: menu-title;
+}
+.products {
+grid-area: products;
+grid-template-columns: repeat(2, 1fr);
+}
+.cart {
+grid-area: cart;
+}
+}
+.delivery-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #ddd;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.delivery-section label {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.delivery-section select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.delivery-section select:focus {
+    border-color: #e74c3c;
+}
+/* ESTILO DAS ABAS DE CATEGORIA */
+.categories-nav {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.category-btn {
+    background: #e2e8f0;
+    color: #334155;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.category-btn.active, .category-btn:hover {
+    background: #e11d48;
+    color: #ffffff;
+}
+/* BOTÃO FLUTUANTE DE ABRIR O MENU LATERAL */
+.btn-menu-lateral {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 998;
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s;
+}
+
+.btn-menu-lateral:hover {
+    background: #e74c3c;
+}
+
+/* SOBREPOSIÇÃO (BACKGROUND ESCURO) */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* GAVETA LATERAL (SIDEBAR) */
+.sidebar-container {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Começa escondido à esquerda */
+    width: 280px;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 1000;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: left 0.3s ease;
+}
+
+.sidebar-container.active {
+    left: 0; /* Desliza para dentro da tela */
+}
+
+/* CABEÇALHO DO MENU LATERAL */
+.sidebar-header {
+    background:  #e74c3c;
+    color: white;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.btn-fechar-sidebar {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+/* LINKS DO MENU LATERAL */
+.sidebar-links {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0;
+}
+
+.sidebar-item {
+    padding: 14px 20px;
+    color: #334155;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-item:hover {
+    background: #f8fafc;
+    color: #e11d48;
+}
+
+.sidebar-item.warning {
+    color: #d97706;
+}
+
+/* RODAPÉ DO MENU */
+.sidebar-footer {
+    padding: 15px 20px;
+    text-align: center;
+    color: #94a3b8;
+    border-top: 1px solid #f1f5f9;
+}

@@ -1,0 +1,183 @@
+/* ==========================================================================
+   Restaurante - ESTILOS DO PAINEL ADMINISTRATIVO (ADMIN.CSS)
+   ========================================================================== */
+
+/* Variáveis de Cores Primárias */
+:root {
+  --color-brand: #f97316;       /* Laranja Restaurante */
+  --color-brand-hover: #ea580c;
+  --color-bg-dark: #0f172a;      /* Slate 900 */
+  --color-card-dark: #020617;    /* Slate 950 */
+  --color-border-dark: #1e293b;  /* Slate 800 */
+}
+
+/* Reset de scrollbar para áreas com listas */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Base Body */
+body {
+  background-color: var(--color-bg-dark);
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* ==========================================================================
+   1. CARDS DO DASHBOARD E ESTATÍSTICAS
+   ========================================================================== */
+
+.dash-card {
+  background-color: var(--color-card-dark);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 1rem; /* rounded-2xl */
+  padding: 1.25rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.dash-card:hover {
+  border-color: #334155;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   2. PASTA E HISTÓRICO DE CLIENTES (CARDS DE CRM)
+   ========================================================================== */
+
+#container-pasta-clientes-admin {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Card individual da ficha do cliente */
+.cliente-ficha-card {
+  background-color: var(--color-card-dark);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.cliente-ficha-card:hover {
+  border-color: #334155;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+/* Tags de pratos preferidos do cliente */
+.tag-prato-favorito {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  color: #cbd5e1;
+  font-size: 0.625rem; /* text-[10px] */
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Badge de Total de Visitas */
+.badge-visitas {
+  background-color: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+  font-size: 0.625rem;
+  font-weight: 900;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   3. BOTÕES E AÇÕES DO ADMINISTRADOR
+   ========================================================================== */
+
+.btn-exportar-excel {
+  background-color: #059669; /* Emerald 600 */
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.75rem; /* text-xs */
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
+.btn-exportar-excel:hover {
+  background-color: #047857; /* Emerald 700 */
+  transform: translateY(-1px);
+}
+
+.btn-exportar-excel:active {
+  transform: translateY(0);
+}
+
+/* Animações e transições do painel */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ==========================================================================
+   AJUSTE DE LAYOUT DO CARDÁPIO (GRID FIX)
+   ========================================================================== */
+
+#container-cardapio-admin {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+  gap: 1.25rem !important;
+  width: 100% !important;
+}
+
+.cardapio-item-card {
+  background-color: #020617; /* slate-950 */
+  border: 1px solid #1e293b; /* slate-800 */
+  border-radius: 1rem;
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0; /* Previne vazamento de texto flexbox */
+  width: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+.cardapio-item-card:hover {
+  border-color: #334155;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}

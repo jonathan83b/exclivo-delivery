@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurante - Painel do Garçom</title>
+
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="../assets/css/painel.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white pb-10">
+
+  <!-- Header do Garçom -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 px-4 h-16 flex items-center justify-between shadow-lg">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 font-bold text-lg">
+        <i class="fa-solid fa-user-tie"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent leading-tight">Painel do Garçom</h1>
+        <p class="text-[11px] text-slate-400">Gestão de Mesas, Atendimentos e Baixas</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-3">
+      <button id="btn-logout" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-700 transition">
+        <i class="fa-solid fa-right-from-bracket mr-1"></i> Sair
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6 flex-grow">
+
+    <!-- Resumo Rápido (Dashboard Cards) -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md flex items-center justify-between">
+        <div>
+          <p class="text-[10px] text-slate-400 uppercase font-bold">Mesas Livres</p>
+          <p class="text-xl font-extrabold text-emerald-400" id="dash-livres">0</p>
+        </div>
+        <div class="w-8 h-8 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center font-bold">
+          <i class="fa-solid fa-chair"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md flex items-center justify-between">
+        <div>
+          <p class="text-[10px] text-slate-400 uppercase font-bold">Ocupadas</p>
+          <p class="text-xl font-extrabold text-blue-400" id="dash-ocupadas">0</p>
+        </div>
+        <div class="w-8 h-8 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center font-bold">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md flex items-center justify-between">
+        <div>
+          <p class="text-[10px] text-slate-400 uppercase font-bold">Chamando</p>
+          <p class="text-xl font-extrabold text-amber-400" id="dash-chamando">0</p>
+        </div>
+        <div class="w-8 h-8 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center font-bold">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md flex items-center justify-between">
+        <div>
+          <p class="text-[10px] text-slate-400 uppercase font-bold">Pedindo Conta</p>
+          <p class="text-xl font-extrabold text-rose-400" id="dash-conta">0</p>
+        </div>
+        <div class="w-8 h-8 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center font-bold">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid com as Mesas do Restaurante -->
+    <div class="space-y-3">
+      <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+        <i class="fa-solid fa-border-all text-brand-500"></i>
+        <span>Mapa Geral das Mesas</span>
+      </h2>
+
+      <div id="grid-mesas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Injetado dinamicamente via JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Detalhes da Comanda & Baixa da Mesa -->
+  <div id="modal-comanda-garcom" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4">
+      
+      <!-- Cabeçalho do Modal -->
+      <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+        <div>
+          <h3 id="comanda-mesa-title" class="text-lg font-bold text-white">Comanda - Mesa --</h3>
+          <p class="text-xs text-slate-400 mt-0.5">
+            <span id="comanda-cliente-nome" class="font-semibold text-slate-200">Cliente</span> • 
+            <span id="comanda-cliente-phone">WhatsApp</span>
+          </p>
+        </div>
+        <button onclick="fecharModalComanda()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Botão para Cancelar Chamado Ativo -->
+      <button id="btn-atender-chamado" class="hidden w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center space-x-2 shadow">
+        <i class="fa-solid fa-check"></i>
+        <span>Marcar Chamado do Garçom como Atendido</span>
+      </button>
+
+      <!-- Lista de Consumo e Status dos Pratos -->
+      <div class="space-y-2">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Itens e Status na Cozinha:</p>
+        <div id="comanda-itens-lista" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+          <!-- Injetado dinamicamente via JS -->
+        </div>
+      </div>
+
+      <!-- Resumo Financeiro & Ações de Envio e Baixa -->
+      <div class="border-t border-slate-800 pt-3 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-slate-400 font-bold uppercase">Total Acumulado:</span>
+          <span id="comanda-total-valor" class="text-xl font-black text-emerald-400">R$ 0,00</span>
+        </div>
+
+        <!-- Botão de Envio de Comanda via WhatsApp -->
+        <button id="btn-whatsapp-comanda" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 shadow transition">
+          <i class="fa-brands fa-whatsapp text-lg"></i>
+          <span>Enviar Comanda via WhatsApp</span>
+        </button>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="fecharModalComanda()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl text-xs">
+            Fechar
+          </button>
+          <button onclick="darBaixaMesa(mesaSelecionadaComanda)" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center space-x-1 shadow-lg shadow-rose-600/20">
+            <i class="fa-solid fa-user-xmark mr-1"></i>
+            <span>Dar Baixa na Mesa</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../assets/js/garcom.js"></script>
+</body>
+</html>
