@@ -26,7 +26,7 @@ window.adicionarProduto = function(nome, preco) {
         });
     }
 
-    atualizarCarrinho();
+    window.atualizarCarrinho();
 };
 
 window.adicionarPizza = function(nomeBase, precoBase, idSelectBorda) {
@@ -79,7 +79,7 @@ window.removerProduto = function(nome) {
         }
     }
 
-    atualizarCarrinho();
+    window.atualizarCarrinho();
 };
 
 window.atualizarCarrinho = function() {
@@ -199,7 +199,7 @@ window.fazerPedido = async function() {
     const novoPedido = {
         id: "#" + Math.floor(1000 + Math.random() * 9000),
         dataHora: new Date().toLocaleString('pt-BR'),
-        dataCriacao: Date.now(), // Essencial para ordenação no Firestore
+        dataCriacao: Date.now(),
         itens: itensFormatados,
         subtotal: subtotalProdutos,
         taxaEntrega: valorTaxa,
@@ -212,14 +212,12 @@ window.fazerPedido = async function() {
         status: "pendente"
     };
 
-    // ENVIA O PEDIDO PARA O FIRESTORE
     try {
         await criarPedido(novoPedido);
     } catch (e) {
         console.error("Erro ao enviar pedido para o Firestore:", e);
     }
 
-    // MENSAGEM DO WHATSAPP
     let mensagem = `*NOVO PEDIDO ${novoPedido.id} - EXCLIVO DELIVERY*\n\n`;
     mensagem += "*Itens do Pedido:*\n";
 
@@ -249,7 +247,7 @@ window.fazerPedido = async function() {
     if (inputRua) inputRua.value = '';
     if (inputNumero) inputNumero.value = '';
     if (inputReferencia) inputReferencia.value = '';
-    atualizarCarrinho();
+    window.atualizarCarrinho();
 };
 
 function verificarHorarioFuncionamento() {
@@ -328,7 +326,7 @@ function carregarProdutosDoCardapio() {
                     </select>
                 </div>
                 <div class="price">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</div>
-                <button type="button" onclick="adicionarPizza('${p.nome}', ${p.preco}, 'borda-${p.id}')">Adicionar</button>
+                <button type="button" onclick="window.adicionarPizza('${p.nome}', ${p.preco}, 'borda-${p.id}')">Adicionar</button>
             `;
         } else if (p.tipoOpcao === 'copos') {
             opcaoHTML = `
@@ -336,12 +334,12 @@ function carregarProdutosDoCardapio() {
                     <label><input type="checkbox" id="copos-${p.id}"> Enviar copos descartáveis</label>
                 </div>
                 <div class="price">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</div>
-                <button type="button" onclick="adicionarComOpcao('${p.nome}', ${p.preco}, 'copos-${p.id}', 'Com copos descartáveis', 0)">Adicionar</button>
+                <button type="button" onclick="window.adicionarComOpcao('${p.nome}', ${p.preco}, 'copos-${p.id}', 'Com copos descartáveis', 0)">Adicionar</button>
             `;
         } else {
             opcaoHTML = `
                 <div class="price" style="margin-top: 15px;">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</div>
-                <button type="button" onclick="adicionarProduto('${p.nome}', ${p.preco})">Adicionar</button>
+                <button type="button" onclick="window.adicionarProduto('${p.nome}', ${p.preco})">Adicionar</button>
             `;
         }
 

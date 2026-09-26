@@ -1,11 +1,9 @@
 import { escutarPedidosEmTempoReal, atualizarStatusPedido } from '../firebase/pedidos.js';
 
-// VERIFICAÇÃO DE SEGURANÇA: Redireciona se não estiver autenticado
 if (sessionStorage.getItem('exclivo_autenticado') !== 'true') {
     window.location.href = 'login.html';
 }
 
-const TELEFONE_RESTAURANTE = "5585987608107";
 let somPermitido = false;
 let qtdPendentesAnterior = null;
 
@@ -158,7 +156,6 @@ function renderizarListaPedidosNoAdmin(pedidos) {
                 </div>
             `;
         } else {
-            // Criamos uma string segura do objeto atual para repassar na função do WhatsApp
             const pedidoJsonStr = JSON.stringify(pedido).replace(/'/g, "&apos;");
             acoesConfirmacaoHTML = `
                 <button type="button" class="btn-notify-wa" onclick='window.enviarNotificacaoWhatsApp(${pedidoJsonStr})'>
@@ -228,7 +225,6 @@ function atualizarEstatisticas(pedidos) {
     if (elFaturamento) elFaturamento.textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
 }
 
-// INICIALIZAÇÃO COM OUVINTE DO FIRESTORE EM TEMPO REAL
 document.addEventListener('DOMContentLoaded', () => {
     escutarPedidosEmTempoReal((pedidos) => {
         const pendentesAtuais = pedidos.filter(p => p.status === 'pendente').length;
