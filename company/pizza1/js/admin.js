@@ -1,5 +1,4 @@
-import { escutarPedidosEmTempoReal, atualizarStatusPedido } from '../firebase/pedidos.js';
-
+// VERIFICAÇÃO DE SEGURANÇA: Redireciona se não estiver autenticado
 if (sessionStorage.getItem('exclivo_autenticado') !== 'true') {
     window.location.href = 'login.html';
 }
@@ -8,7 +7,7 @@ const TELEFONE_RESTAURANTE = "5585987608107";
 let somPermitido = false;
 let qtdPendentesAnterior = null;
 
-// FUNÇÕES DO HEADER LIGADAS AO WINDOW
+// Alterna a permissão de áudio do navegador
 window.toggleSom = function() {
     somPermitido = !somPermitido;
     const btn = document.getElementById('btn-som');
@@ -21,18 +20,6 @@ window.toggleSom = function() {
             btn.style.background = '#f59e0b';
             btn.textContent = '🔕 Som Desativado';
         }
-    }
-};
-
-window.fazerLogout = function() {
-    sessionStorage.removeItem('exclivo_autenticado');
-    window.location.href = 'login.html';
-};
-
-window.limparHistorico = function() {
-    if (confirm('Atenção: Os pedidos são geridos no Firebase. Deseja limpar a visualização local?')) {
-        const container = document.getElementById('orders-list');
-        if (container) container.innerHTML = '<p class="no-orders">Nenhum pedido recebido ainda.</p>';
     }
 };
 
@@ -53,27 +40,52 @@ function tocarCampainha() {
         gain1.connect(ctx.destination);
         osc1.start(ctx.currentTime);
         osc1.stop(ctx.currentTime + 0.3);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1200, ctx.currentTime + 0.2);
+        gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.2);
+        gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(ctx.currentTime + 0.2);
+        osc2.stop(ctx.currentTime + 0.6);
     } catch (e) {
         console.error("Erro ao tocar áudio:", e);
     }
 }
 
-window.confirmarPedido = async function(idDoc) {
-    await atualizarStatusPedido(idDoc, 'preparo');
+window.fazerLogout = function() {
+    sessionStorage.removeItem('exclivo_autenticado');
+    window.location.href = 'login.html';
 };
 
-window.recusarPedido = async function(idDoc) {
-    const motivo = prompt("Motivo do cancelamento/recusa do pedido (opcional):");
-    if (motivo !== null) {
-        await atualizarStatusPedido(idDoc, 'cancelado', motivo || 'Indisponível no momento');
+window.confirmarPedido = function(index) {
+    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
+    if (pedidos[index]) {
+        pedidos[index].status = 'preparo';
+        localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidos));
+        carregarPedidos();
     }
 };
 
-window.alterarStatus = async function(idDoc, novoStatus) {
-    await atualizarStatusPedido(idDoc, novoStatus);
+window.recusarPedido = function(index) {
+    const motivo = prompt("Motivo do cancelamento/recusa do pedido (opcional):");
+    if (motivo !== null) {
+        const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
+        if (pedidos[index]) {
+            pedidos[index].status = 'cancelado';
+            pedidos[index].motivoCancelamento = motivo || 'Indisponível no momento';
+            localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidos));
+            carregarPedidos();
+        }
+    }
 };
 
-window.enviarNotificacaoWhatsApp = function(pedido) {
+window.enviarNotificacaoWhatsApp = function(index) {
+    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
+    const pedido = pedidos[index];
     if (!pedido) return;
 
     let mensagem = `*ATUALIZAÇÃO DO PEDIDO ${pedido.id} - EXCLIVO DELIVERY*\n\n`;
@@ -101,9 +113,28 @@ window.enviarNotificacaoWhatsApp = function(pedido) {
     window.open(url, '_blank');
 };
 
-function carregarPedidos(pedidos) {
+window.alterarStatus = function(index, novoStatus) {
+    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
+    if (pedidos[index]) {
+        pedidos[index].status = novoStatus;
+        localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidos));
+        carregarPedidos();
+    }
+};
+
+window.limparHistorico = function() {
+    if (confirm('Tem certeza que deseja apagar todo o histórico de pedidos?')) {
+        localStorage.removeItem('exclivo_pedidos');
+        qtdPendentesAnterior = 0;
+        carregarPedidos();
+    }
+};
+
+function carregarPedidos() {
     const container = document.getElementById('orders-list');
     if (!container) return;
+
+    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
 
     const pendentesAtuais = pedidos.filter(p => p.status === 'pendente').length;
     
@@ -121,7 +152,7 @@ function carregarPedidos(pedidos) {
 
     container.innerHTML = '';
 
-    pedidos.forEach((pedido) => {
+    pedidos.forEach((pedido, index) => {
         const card = document.createElement('div');
         const statusAtual = pedido.status || 'pendente';
         card.className = `order-card ${statusAtual}`;
@@ -149,7 +180,6 @@ function carregarPedidos(pedidos) {
         }
 
         const totalExibicao = (pedido.total || 0).toFixed(2).replace('.', ',');
-        const idDoc = pedido.idDoc;
 
         let acoesConfirmacaoHTML = '';
         if (statusAtual === 'pendente') {
@@ -157,15 +187,14 @@ function carregarPedidos(pedidos) {
                 <div class="confirm-box">
                     <span class="badge-pendente">⚠️ NOVO PEDIDO - CONFIRMAÇÃO PENDENTE</span>
                     <div class="confirm-buttons">
-                        <button type="button" class="btn-confirm" onclick="window.confirmarPedido('${idDoc}')">✅ Confirmar Pedido</button>
-                        <button type="button" class="btn-reject" onclick="window.recusarPedido('${idDoc}')">❌ Recusar</button>
+                        <button type="button" class="btn-confirm" onclick="window.confirmarPedido(${index})">✅ Confirmar Pedido</button>
+                        <button type="button" class="btn-reject" onclick="window.recusarPedido(${index})">❌ Recusar</button>
                     </div>
                 </div>
             `;
         } else {
-            const pedidoJsonStr = JSON.stringify(pedido).replace(/'/g, "&apos;");
             acoesConfirmacaoHTML = `
-                <button type="button" class="btn-notify-wa" onclick='window.enviarNotificacaoWhatsApp(${pedidoJsonStr})'>
+                <button type="button" class="btn-notify-wa" onclick="window.enviarNotificacaoWhatsApp(${index})">
                     💬 Notificar Cliente via Whats
                 </button>
             `;
@@ -197,7 +226,7 @@ function carregarPedidos(pedidos) {
                     Total: R$ ${totalExibicao}
                 </div>
                 <div>
-                    <select class="order-status-select" onchange="window.alterarStatus('${idDoc}', this.value)">
+                    <select class="order-status-select" onchange="window.alterarStatus(${index}, this.value)">
                         <option value="pendente" ${statusAtual === 'pendente' ? 'selected' : ''}>🟡 Pendente</option>
                         <option value="preparo" ${statusAtual === 'preparo' ? 'selected' : ''}>🔵 Em Preparo (Confirmado)</option>
                         <option value="entrega" ${statusAtual === 'entrega' ? 'selected' : ''}>🟣 Saiu para Entrega</option>
@@ -232,8 +261,14 @@ function atualizarEstatisticas(pedidos) {
     if (elFaturamento) elFaturamento.textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
 }
 
+// ESCUTA EVENTO DE STORAGE EM TEMPO REAL
+window.addEventListener('storage', (e) => {
+    if (e.key === 'exclivo_pedidos') {
+        carregarPedidos();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
-    escutarPedidosEmTempoReal((pedidos) => {
-        carregarPedidos(pedidos);
-    });
+    carregarPedidos();
+    setInterval(carregarPedidos, 2000);
 });

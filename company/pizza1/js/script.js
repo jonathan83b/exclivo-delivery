@@ -1,5 +1,3 @@
-import { criarPedido } from '../firebase/pedidos.js';
-
 // CONFIGURAÇÕES DO RESTAURANTE
 const CONFIG = {
     telefoneWhatsApp: "5585987608107", 
@@ -26,7 +24,7 @@ window.adicionarProduto = function(nome, preco) {
         });
     }
 
-    window.atualizarCarrinho();
+    atualizarCarrinho();
 };
 
 window.adicionarPizza = function(nomeBase, precoBase, idSelectBorda) {
@@ -79,7 +77,7 @@ window.removerProduto = function(nome) {
         }
     }
 
-    window.atualizarCarrinho();
+    atualizarCarrinho();
 };
 
 window.atualizarCarrinho = function() {
@@ -140,7 +138,7 @@ window.atualizarCarrinho = function() {
     elementoTotal.textContent = totalGeral.toFixed(2).replace('.', ',');
 };
 
-window.fazerPedido = async function() {
+window.fazerPedido = function() {
     if (carrinho.length === 0) {
         alert('Seu carrinho está vazio. Adicione pelo menos um item!');
         return;
@@ -199,7 +197,6 @@ window.fazerPedido = async function() {
     const novoPedido = {
         id: "#" + Math.floor(1000 + Math.random() * 9000),
         dataHora: new Date().toLocaleString('pt-BR'),
-        dataCriacao: Date.now(),
         itens: itensFormatados,
         subtotal: subtotalProdutos,
         taxaEntrega: valorTaxa,
@@ -212,13 +209,16 @@ window.fazerPedido = async function() {
         status: "pendente"
     };
 
-    // ENVIA PARA O FIRESTORE
+    // GUARDA OS PEDIDOS NO LOCALSTORAGE (CHAVE UNIFICADA)
     try {
-        await criarPedido(novoPedido);
+        const pedidosExistentes = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
+        pedidosExistentes.unshift(novoPedido);
+        localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidosExistentes));
     } catch (e) {
-        console.error("Erro ao enviar pedido para o Firestore:", e);
+        console.error("Erro ao salvar no LocalStorage:", e);
     }
 
+    // MENSAGEM DO WHATSAPP
     let mensagem = `*NOVO PEDIDO ${novoPedido.id} - EXCLIVO DELIVERY*\n\n`;
     mensagem += "*Itens do Pedido:*\n";
 
@@ -248,7 +248,7 @@ window.fazerPedido = async function() {
     if (inputRua) inputRua.value = '';
     if (inputNumero) inputNumero.value = '';
     if (inputReferencia) inputReferencia.value = '';
-    window.atualizarCarrinho();
+    atualizarCarrinho();
 };
 
 function verificarHorarioFuncionamento() {
@@ -280,12 +280,16 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarHorarioFuncionamento();
     setInterval(verificarHorarioFuncionamento, 60000);
 });
-
+/**
+ * Filtra os produtos por categoria na tela sem sobreposição
+ */
 window.filtrarCategoria = function(categoria, elementoBtn) {
+    // Atualiza o estado dos botões de aba
     const botoes = document.querySelectorAll('.category-btn');
     botoes.forEach(btn => btn.classList.remove('active'));
     if (elementoBtn) elementoBtn.classList.add('active');
 
+    // Oculta/Exibe os produtos
     const produtos = document.querySelectorAll('.product');
     produtos.forEach(prod => {
         const catProduto = prod.getAttribute('data-categoria');
@@ -296,10 +300,12 @@ window.filtrarCategoria = function(categoria, elementoBtn) {
         }
     });
 };
-
+/**
+ * Renderiza dinamicamente os produtos cadastrados via Painel de Gestão
+ */
 function carregarProdutosDoCardapio() {
     const salvo = localStorage.getItem('exclivo_cardapio');
-    if (!salvo) return;
+    if (!salvo) return; // Se não houver nada configurado, mantém os do HTML estático
 
     const cardapio = JSON.parse(salvo);
     const containerProdutos = document.querySelector('.products');
@@ -308,7 +314,7 @@ function carregarProdutosDoCardapio() {
     containerProdutos.innerHTML = '';
 
     cardapio.forEach(p => {
-        if (p.status === 'inativo') return;
+        if (p.status === 'inativo') return; // Pula itens desativados
 
         const div = document.createElement('div');
         div.className = 'product';
@@ -327,7 +333,7 @@ function carregarProdutosDoCardapio() {
                     </select>
                 </div>
                 <div class="price">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</div>
-                <button type="button" onclick="window.adicionarPizza('${p.nome}', ${p.preco}, 'borda-${p.id}')">Adicionar</button>
+                <button type="button" onclick="adicionarPizza('${p.nome}', ${p.preco}, 'borda-${p.id}')">Adicionar</button>
             `;
         } else if (p.tipoOpcao === 'copos') {
             opcaoHTML = `
@@ -335,12 +341,12 @@ function carregarProdutosDoCardapio() {
                     <label><input type="checkbox" id="copos-${p.id}"> Enviar copos descartáveis</label>
                 </div>
                 <div class="price">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</div>
-                <button type="button" onclick="window.adicionarComOpcao('${p.nome}', ${p.preco}, 'copos-${p.id}', 'Com copos descartáveis', 0)">Adicionar</button>
+                <button type="button" onclick="adicionarComOpcao('${p.nome}', ${p.preco}, 'copos-${p.id}', 'Com copos descartáveis', 0)">Adicionar</button>
             `;
         } else {
             opcaoHTML = `
                 <div class="price" style="margin-top: 15px;">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</div>
-                <button type="button" onclick="window.adicionarProduto('${p.nome}', ${p.preco})">Adicionar</button>
+                <button type="button" onclick="adicionarProduto('${p.nome}', ${p.preco})">Adicionar</button>
             `;
         }
 
@@ -354,10 +360,13 @@ function carregarProdutosDoCardapio() {
     });
 }
 
+// Executa ao carregar o site
 document.addEventListener('DOMContentLoaded', () => {
     carregarProdutosDoCardapio();
 });
-
+/**
+ * Abre / Fecha a Gaveta Lateral (Sidebar)
+ */
 window.toggleSidebar = function() {
     const sidebar = document.getElementById('sidebar-container');
     const overlay = document.getElementById('sidebar-overlay');
