@@ -212,6 +212,7 @@ window.fazerPedido = async function() {
         status: "pendente"
     };
 
+    // ENVIA PARA O FIRESTORE
     try {
         await criarPedido(novoPedido);
     } catch (e) {

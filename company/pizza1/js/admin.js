@@ -4,6 +4,7 @@ if (sessionStorage.getItem('exclivo_autenticado') !== 'true') {
     window.location.href = 'login.html';
 }
 
+const TELEFONE_RESTAURANTE = "5585987608107";
 let somPermitido = false;
 let qtdPendentesAnterior = null;
 
@@ -103,9 +104,18 @@ window.enviarNotificacaoWhatsApp = function(pedido) {
     window.open(url, '_blank');
 };
 
-function renderizarListaPedidosNoAdmin(pedidos) {
+function carregarPedidos(pedidos) {
     const container = document.getElementById('orders-list');
     if (!container) return;
+
+    const pendentesAtuais = pedidos.filter(p => p.status === 'pendente').length;
+    
+    if (qtdPendentesAnterior !== null && pendentesAtuais > qtdPendentesAnterior) {
+        tocarCampainha();
+    }
+    qtdPendentesAnterior = pendentesAtuais;
+
+    atualizarEstatisticas(pedidos);
 
     if (pedidos.length === 0) {
         container.innerHTML = '<p class="no-orders">Nenhum pedido recebido ainda.</p>';
@@ -142,7 +152,7 @@ function renderizarListaPedidosNoAdmin(pedidos) {
         }
 
         const totalExibicao = (pedido.total || 0).toFixed(2).replace('.', ',');
-        const idDoc = pedido.idDoc;
+        const idDoc = pedido.idDoc; // ID único do documento gerado no Firestore
 
         let acoesConfirmacaoHTML = '';
         if (statusAtual === 'pendente') {
@@ -225,16 +235,9 @@ function atualizarEstatisticas(pedidos) {
     if (elFaturamento) elFaturamento.textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
 }
 
+// INICIALIZAÇÃO OUVINDO O FIRESTORE EM TEMPO REAL
 document.addEventListener('DOMContentLoaded', () => {
     escutarPedidosEmTempoReal((pedidos) => {
-        const pendentesAtuais = pedidos.filter(p => p.status === 'pendente').length;
-        
-        if (qtdPendentesAnterior !== null && pendentesAtuais > qtdPendentesAnterior) {
-            tocarCampainha();
-        }
-        qtdPendentesAnterior = pendentesAtuais;
-
-        atualizarEstatisticas(pedidos);
-        renderizarListaPedidosNoAdmin(pedidos);
+        carregarPedidos(pedidos);
     });
 });
