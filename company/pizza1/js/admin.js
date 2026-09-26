@@ -1,3 +1,5 @@
+import { escutarPedidosEmTempoReal, atualizarStatusPedido } from '../firebase/pedidos.js';
+
 // VERIFICAÇÃO DE SEGURANÇA: Redireciona se não estiver autenticado
 if (sessionStorage.getItem('exclivo_autenticado') !== 'true') {
     window.location.href = 'login.html';
@@ -7,7 +9,6 @@ const TELEFONE_RESTAURANTE = "5585987608107";
 let somPermitido = false;
 let qtdPendentesAnterior = null;
 
-// Alterna a permissão de áudio do navegador
 window.toggleSom = function() {
     somPermitido = !somPermitido;
     const btn = document.getElementById('btn-som');
@@ -61,31 +62,22 @@ window.fazerLogout = function() {
     window.location.href = 'login.html';
 };
 
-window.confirmarPedido = function(index) {
-    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
-    if (pedidos[index]) {
-        pedidos[index].status = 'preparo';
-        localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidos));
-        carregarPedidos();
-    }
+window.confirmarPedido = async function(idDoc) {
+    await atualizarStatusPedido(idDoc, 'preparo');
 };
 
-window.recusarPedido = function(index) {
+window.recusarPedido = async function(idDoc) {
     const motivo = prompt("Motivo do cancelamento/recusa do pedido (opcional):");
     if (motivo !== null) {
-        const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
-        if (pedidos[index]) {
-            pedidos[index].status = 'cancelado';
-            pedidos[index].motivoCancelamento = motivo || 'Indisponível no momento';
-            localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidos));
-            carregarPedidos();
-        }
+        await atualizarStatusPedido(idDoc, 'cancelado', motivo || 'Indisponível no momento');
     }
 };
 
-window.enviarNotificacaoWhatsApp = function(index) {
-    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
-    const pedido = pedidos[index];
+window.alterarStatus = async function(idDoc, novoStatus) {
+    await atualizarStatusPedido(idDoc, novoStatus);
+};
+
+window.enviarNotificacaoWhatsApp = function(pedido) {
     if (!pedido) return;
 
     let mensagem = `*ATUALIZAÇÃO DO PEDIDO ${pedido.id} - EXCLIVO DELIVERY*\n\n`;
@@ -113,37 +105,9 @@ window.enviarNotificacaoWhatsApp = function(index) {
     window.open(url, '_blank');
 };
 
-window.alterarStatus = function(index, novoStatus) {
-    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
-    if (pedidos[index]) {
-        pedidos[index].status = novoStatus;
-        localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidos));
-        carregarPedidos();
-    }
-};
-
-window.limparHistorico = function() {
-    if (confirm('Tem certeza que deseja apagar todo o histórico de pedidos?')) {
-        localStorage.removeItem('exclivo_pedidos');
-        qtdPendentesAnterior = 0;
-        carregarPedidos();
-    }
-};
-
-function carregarPedidos() {
+function renderizarListaPedidosNoAdmin(pedidos) {
     const container = document.getElementById('orders-list');
     if (!container) return;
-
-    const pedidos = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
-
-    const pendentesAtuais = pedidos.filter(p => p.status === 'pendente').length;
-    
-    if (qtdPendentesAnterior !== null && pendentesAtuais > qtdPendentesAnterior) {
-        tocarCampainha();
-    }
-    qtdPendentesAnterior = pendentesAtuais;
-
-    atualizarEstatisticas(pedidos);
 
     if (pedidos.length === 0) {
         container.innerHTML = '<p class="no-orders">Nenhum pedido recebido ainda.</p>';
@@ -152,7 +116,7 @@ function carregarPedidos() {
 
     container.innerHTML = '';
 
-    pedidos.forEach((pedido, index) => {
+    pedidos.forEach((pedido) => {
         const card = document.createElement('div');
         const statusAtual = pedido.status || 'pendente';
         card.className = `order-card ${statusAtual}`;
@@ -180,6 +144,7 @@ function carregarPedidos() {
         }
 
         const totalExibicao = (pedido.total || 0).toFixed(2).replace('.', ',');
+        const idDoc = pedido.idDoc;
 
         let acoesConfirmacaoHTML = '';
         if (statusAtual === 'pendente') {
@@ -187,14 +152,16 @@ function carregarPedidos() {
                 <div class="confirm-box">
                     <span class="badge-pendente">⚠️ NOVO PEDIDO - CONFIRMAÇÃO PENDENTE</span>
                     <div class="confirm-buttons">
-                        <button type="button" class="btn-confirm" onclick="window.confirmarPedido(${index})">✅ Confirmar Pedido</button>
-                        <button type="button" class="btn-reject" onclick="window.recusarPedido(${index})">❌ Recusar</button>
+                        <button type="button" class="btn-confirm" onclick="window.confirmarPedido('${idDoc}')">✅ Confirmar Pedido</button>
+                        <button type="button" class="btn-reject" onclick="window.recusarPedido('${idDoc}')">❌ Recusar</button>
                     </div>
                 </div>
             `;
         } else {
+            // Criamos uma string segura do objeto atual para repassar na função do WhatsApp
+            const pedidoJsonStr = JSON.stringify(pedido).replace(/'/g, "&apos;");
             acoesConfirmacaoHTML = `
-                <button type="button" class="btn-notify-wa" onclick="window.enviarNotificacaoWhatsApp(${index})">
+                <button type="button" class="btn-notify-wa" onclick='window.enviarNotificacaoWhatsApp(${pedidoJsonStr})'>
                     💬 Notificar Cliente via Whats
                 </button>
             `;
@@ -226,7 +193,7 @@ function carregarPedidos() {
                     Total: R$ ${totalExibicao}
                 </div>
                 <div>
-                    <select class="order-status-select" onchange="window.alterarStatus(${index}, this.value)">
+                    <select class="order-status-select" onchange="window.alterarStatus('${idDoc}', this.value)">
                         <option value="pendente" ${statusAtual === 'pendente' ? 'selected' : ''}>🟡 Pendente</option>
                         <option value="preparo" ${statusAtual === 'preparo' ? 'selected' : ''}>🔵 Em Preparo (Confirmado)</option>
                         <option value="entrega" ${statusAtual === 'entrega' ? 'selected' : ''}>🟣 Saiu para Entrega</option>
@@ -261,14 +228,17 @@ function atualizarEstatisticas(pedidos) {
     if (elFaturamento) elFaturamento.textContent = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
 }
 
-// ESCUTA EVENTO DE STORAGE EM TEMPO REAL
-window.addEventListener('storage', (e) => {
-    if (e.key === 'exclivo_pedidos') {
-        carregarPedidos();
-    }
-});
-
+// INICIALIZAÇÃO COM OUVINTE DO FIRESTORE EM TEMPO REAL
 document.addEventListener('DOMContentLoaded', () => {
-    carregarPedidos();
-    setInterval(carregarPedidos, 2000);
+    escutarPedidosEmTempoReal((pedidos) => {
+        const pendentesAtuais = pedidos.filter(p => p.status === 'pendente').length;
+        
+        if (qtdPendentesAnterior !== null && pendentesAtuais > qtdPendentesAnterior) {
+            tocarCampainha();
+        }
+        qtdPendentesAnterior = pendentesAtuais;
+
+        atualizarEstatisticas(pedidos);
+        renderizarListaPedidosNoAdmin(pedidos);
+    });
 });
