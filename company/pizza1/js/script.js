@@ -1,3 +1,5 @@
+import { criarPedido } from '../firebase/pedidos.js';
+
 // CONFIGURAÇÕES DO RESTAURANTE
 const CONFIG = {
     telefoneWhatsApp: "5585987608107", 
@@ -138,7 +140,7 @@ window.atualizarCarrinho = function() {
     elementoTotal.textContent = totalGeral.toFixed(2).replace('.', ',');
 };
 
-window.fazerPedido = function() {
+window.fazerPedido = async function() {
     if (carrinho.length === 0) {
         alert('Seu carrinho está vazio. Adicione pelo menos um item!');
         return;
@@ -197,6 +199,7 @@ window.fazerPedido = function() {
     const novoPedido = {
         id: "#" + Math.floor(1000 + Math.random() * 9000),
         dataHora: new Date().toLocaleString('pt-BR'),
+        dataCriacao: Date.now(), // Essencial para ordenação no Firestore
         itens: itensFormatados,
         subtotal: subtotalProdutos,
         taxaEntrega: valorTaxa,
@@ -209,20 +212,11 @@ window.fazerPedido = function() {
         status: "pendente"
     };
 
-    // GUARDA OS PEDIDOS NO LOCALSTORAGE (CHAVE UNIFICADA)
+    // ENVIA O PEDIDO PARA O FIRESTORE
     try {
-        const pedidosExistentes = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
-        pedidosExistentes.unshift(novoPedido);
-    await fetch('URL_DA_API', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(novoPedido)
-});
-        // localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidosExistentes));
+        await criarPedido(novoPedido);
     } catch (e) {
-        console.error("Erro ao salvar no LocalStorage:", e);
+        console.error("Erro ao enviar pedido para o Firestore:", e);
     }
 
     // MENSAGEM DO WHATSAPP
@@ -287,16 +281,12 @@ document.addEventListener('DOMContentLoaded', () => {
     verificarHorarioFuncionamento();
     setInterval(verificarHorarioFuncionamento, 60000);
 });
-/**
- * Filtra os produtos por categoria na tela sem sobreposição
- */
+
 window.filtrarCategoria = function(categoria, elementoBtn) {
-    // Atualiza o estado dos botões de aba
     const botoes = document.querySelectorAll('.category-btn');
     botoes.forEach(btn => btn.classList.remove('active'));
     if (elementoBtn) elementoBtn.classList.add('active');
 
-    // Oculta/Exibe os produtos
     const produtos = document.querySelectorAll('.product');
     produtos.forEach(prod => {
         const catProduto = prod.getAttribute('data-categoria');
@@ -307,12 +297,10 @@ window.filtrarCategoria = function(categoria, elementoBtn) {
         }
     });
 };
-/**
- * Renderiza dinamicamente os produtos cadastrados via Painel de Gestão
- */
+
 function carregarProdutosDoCardapio() {
     const salvo = localStorage.getItem('exclivo_cardapio');
-    if (!salvo) return; // Se não houver nada configurado, mantém os do HTML estático
+    if (!salvo) return;
 
     const cardapio = JSON.parse(salvo);
     const containerProdutos = document.querySelector('.products');
@@ -321,7 +309,7 @@ function carregarProdutosDoCardapio() {
     containerProdutos.innerHTML = '';
 
     cardapio.forEach(p => {
-        if (p.status === 'inativo') return; // Pula itens desativados
+        if (p.status === 'inativo') return;
 
         const div = document.createElement('div');
         div.className = 'product';
@@ -367,13 +355,10 @@ function carregarProdutosDoCardapio() {
     });
 }
 
-// Executa ao carregar o site
 document.addEventListener('DOMContentLoaded', () => {
     carregarProdutosDoCardapio();
 });
-/**
- * Abre / Fecha a Gaveta Lateral (Sidebar)
- */
+
 window.toggleSidebar = function() {
     const sidebar = document.getElementById('sidebar-container');
     const overlay = document.getElementById('sidebar-overlay');
