@@ -213,7 +213,14 @@ window.fazerPedido = function() {
     try {
         const pedidosExistentes = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
         pedidosExistentes.unshift(novoPedido);
-        localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidosExistentes));
+    await fetch('URL_DA_API', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(novoPedido)
+});
+        // localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidosExistentes));
     } catch (e) {
         console.error("Erro ao salvar no LocalStorage:", e);
     }
