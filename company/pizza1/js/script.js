@@ -140,120 +140,375 @@ window.atualizarCarrinho = function() {
 };
 
 window.fazerPedido = async function() {
+
     if (carrinho.length === 0) {
+
         alert('Seu carrinho está vazio. Adicione pelo menos um item!');
+
         return;
     }
 
-    const selectTaxa = document.getElementById('taxa-entrega');
-    const opcaoSelecionada = selectTaxa ? selectTaxa.options[selectTaxa.selectedIndex] : null;
-    const valorTaxa = selectTaxa ? parseFloat(selectTaxa.value) || 0 : 0;
-    const nomeBairro = opcaoSelecionada ? (opcaoSelecionada.getAttribute('data-nome') || opcaoSelecionada.text) : 'Não informado';
-    
-    const inputRua = document.getElementById('rua-cliente');
-    const inputNumero = document.getElementById('numero-cliente');
-    const inputReferencia = document.getElementById('referencia-cliente');
 
-    const rua = inputRua ? inputRua.value.trim() : '';
-    const numero = inputNumero ? inputNumero.value.trim() : '';
-    const referencia = inputReferencia ? inputReferencia.value.trim() : '';
+    const selectTaxa =
+        document.getElementById('taxa-entrega');
 
-    const precisaEntrega = valorTaxa > 0 || nomeBairro !== 'Retirar no local';
+
+    const opcaoSelecionada =
+        selectTaxa
+            ? selectTaxa.options[selectTaxa.selectedIndex]
+            : null;
+
+
+    const valorTaxa =
+        selectTaxa
+            ? parseFloat(selectTaxa.value) || 0
+            : 0;
+
+
+    const nomeBairro =
+        opcaoSelecionada
+            ? (
+                opcaoSelecionada.getAttribute('data-nome')
+                || opcaoSelecionada.text
+            )
+            : 'Não informado';
+
+
+    const inputRua =
+        document.getElementById('rua-cliente');
+
+
+    const inputNumero =
+        document.getElementById('numero-cliente');
+
+
+    const inputReferencia =
+        document.getElementById('referencia-cliente');
+
+
+    const rua =
+        inputRua
+            ? inputRua.value.trim()
+            : '';
+
+
+    const numero =
+        inputNumero
+            ? inputNumero.value.trim()
+            : '';
+
+
+    const referencia =
+        inputReferencia
+            ? inputReferencia.value.trim()
+            : '';
+
+
+    const precisaEntrega =
+        valorTaxa > 0 ||
+        nomeBairro !== 'Retirar no local';
+
+
+    /*
+     * VALIDAÇÃO
+     */
 
     if (precisaEntrega) {
+
         if (!rua) {
-            alert('Por favor, informe a Rua/Avenida para entrega!');
-            if (inputRua) inputRua.focus();
+
+            alert(
+                'Por favor, informe a Rua/Avenida para entrega!'
+            );
+
+            if (inputRua) {
+                inputRua.focus();
+            }
+
             return;
         }
+
+
         if (!numero) {
-            alert('Por favor, informe o Número da residência!');
-            if (inputNumero) inputNumero.focus();
+
+            alert(
+                'Por favor, informe o Número da residência!'
+            );
+
+            if (inputNumero) {
+                inputNumero.focus();
+            }
+
             return;
         }
     }
+
+
+    /*
+     * CALCULA OS ITENS
+     */
 
     let subtotalProdutos = 0;
-    const itensFormatados = carrinho.map(item => {
-        const subtotal = item.preco * item.quantidade;
-        subtotalProdutos += subtotal;
-        return {
-            nome: item.nome,
-            quantidade: item.quantidade,
-            precoUnitario: item.preco,
-            subtotal: subtotal
-        };
-    });
 
-    const totalGeral = subtotalProdutos + valorTaxa;
 
-    let enderecoFormatado = 'Retirada no local';
+    const itensFormatados =
+        carrinho.map(item => {
+
+            const subtotal =
+                item.preco * item.quantidade;
+
+
+            subtotalProdutos += subtotal;
+
+
+            return {
+
+                nome: item.nome,
+
+                quantidade: item.quantidade,
+
+                precoUnitario: item.preco,
+
+                subtotal: subtotal
+
+            };
+
+        });
+
+
+    const totalGeral =
+        subtotalProdutos + valorTaxa;
+
+
+    /*
+     * ENDEREÇO
+     */
+
+    let enderecoFormatado =
+        'Retirada no local';
+
+
     if (precisaEntrega) {
-        enderecoFormatado = `${rua}, Nº ${numero}`;
+
+        enderecoFormatado =
+            `${rua}, Nº ${numero}`;
+
+
         if (referencia) {
-            enderecoFormatado += ` (${referencia})`;
+
+            enderecoFormatado +=
+                ` (${referencia})`;
         }
     }
+
+
+    /*
+     * NÚMERO DO PEDIDO
+     */
+
+    const numeroPedido =
+        "#" +
+        Math.floor(
+            1000 + Math.random() * 9000
+        );
+
+
+    /*
+     * OBJETO DO PEDIDO
+     */
 
     const novoPedido = {
-        id: "#" + Math.floor(1000 + Math.random() * 9000),
+
+        numeroPedido: numeroPedido,
+
         restaurantId: "pizza1",
-        dataCriacao: Date.now(),
-        dataHora: new Date().toLocaleString('pt-BR'),
+
+        dataHora:
+            new Date().toLocaleString('pt-BR'),
+
         itens: itensFormatados,
+
         subtotal: subtotalProdutos,
+
         taxaEntrega: valorTaxa,
+
         bairro: nomeBairro,
+
         rua: rua,
+
         numero: numero,
+
         referencia: referencia,
+
         endereco: enderecoFormatado,
+
         total: totalGeral,
+
         status: "pendente"
+
     };
 
-    // GUARDA OS PEDIDOS NO LOCALSTORAGE (CHAVE UNIFICADA)
-    const resultado = await criarPedido(novoPedido);
 
-if (!resultado.success) {
-    alert('Não foi possível enviar o pedido. Tente novamente.');
-    return;
-}
+    /*
+     * ENVIA PARA FIREBASE
+     */
 
-console.log('Pedido salvo no Firestore:', resultado.id);
-    
+    console.log(
+        "Enviando pedido para o Firestore...",
+        novoPedido
+    );
 
-    // MENSAGEM DO WHATSAPP
-    let mensagem = `*NOVO PEDIDO ${novoPedido.id} - EXCLIVO DELIVERY*\n\n`;
-    mensagem += "*Itens do Pedido:*\n";
 
-    carrinho.forEach(item => {
-        mensagem += `• ${item.quantidade}x ${item.nome} - R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}\n`;
-    });
+    try {
 
-    mensagem += `\n*Subtotal:* R$ ${subtotalProdutos.toFixed(2).replace('.', ',')}\n`;
-    mensagem += `*Entrega (${nomeBairro}):* R$ ${valorTaxa.toFixed(2).replace('.', ',')}\n`;
-    
-    if (precisaEntrega) {
-        mensagem += `📍 *Rua:* ${rua}\n`;
-        mensagem += `🏠 *Número:* ${numero}\n`;
-        if (referencia) {
-            mensagem += `🚩 *Ref/Comp:* ${referencia}\n`;
+        const resultado =
+            await criarPedido(novoPedido);
+
+
+        if (!resultado.success) {
+
+            console.error(
+                "Falha ao salvar pedido:",
+                resultado.error
+            );
+
+
+            alert(
+                'Não foi possível enviar o pedido. Tente novamente.'
+            );
+
+            return;
         }
-    } else {
-        mensagem += `📍 *Opção:* Retirada no local\n`;
+
+
+        console.log(
+            "Pedido salvo no Firestore:",
+            resultado.id
+        );
+
+
+        /*
+         * WHATSAPP
+         */
+
+        let mensagem =
+            `*NOVO PEDIDO ${numeroPedido} - EXCLIVO DELIVERY*\n\n`;
+
+
+        mensagem +=
+            "*Itens do Pedido:*\n";
+
+
+        carrinho.forEach(item => {
+
+            mensagem +=
+                `• ${item.quantidade}x ${item.nome} - R$ ` +
+                `${(
+                    item.preco *
+                    item.quantidade
+                )
+                .toFixed(2)
+                .replace('.', ',')}\n`;
+
+        });
+
+
+        mensagem +=
+            `\n*Subtotal:* R$ ` +
+            `${subtotalProdutos
+                .toFixed(2)
+                .replace('.', ',')}`;
+
+
+        mensagem +=
+            `\n*Entrega (${nomeBairro}):* R$ ` +
+            `${valorTaxa
+                .toFixed(2)
+                .replace('.', ',')}`;
+
+
+        if (precisaEntrega) {
+
+            mensagem +=
+                `\n📍 *Rua:* ${rua}`;
+
+            mensagem +=
+                `\n🏠 *Número:* ${numero}`;
+
+
+            if (referencia) {
+
+                mensagem +=
+                    `\n🚩 *Referência:* ${referencia}`;
+            }
+
+        } else {
+
+            mensagem +=
+                `\n📍 *Opção:* Retirada no local`;
+        }
+
+
+        mensagem +=
+            `\n*TOTAL FINAL:* R$ ` +
+            `${totalGeral
+                .toFixed(2)
+                .replace('.', ',')}`;
+
+
+        const url =
+            `https://wa.me/${CONFIG.telefoneWhatsApp}` +
+            `?text=${encodeURIComponent(mensagem)}`;
+
+
+        window.open(
+            url,
+            '_blank'
+        );
+
+
+        /*
+         * LIMPA O CARRINHO
+         */
+
+        carrinho = [];
+
+
+        if (inputRua) {
+            inputRua.value = '';
+        }
+
+
+        if (inputNumero) {
+            inputNumero.value = '';
+        }
+
+
+        if (inputReferencia) {
+            inputReferencia.value = '';
+        }
+
+
+        atualizarCarrinho();
+
+
+        alert(
+            `Pedido ${numeroPedido} enviado com sucesso!`
+        );
+
+
+    } catch (erro) {
+
+        console.error(
+            "Erro inesperado ao fazer pedido:",
+            erro
+        );
+
+
+        alert(
+            'Ocorreu um erro ao enviar o pedido.'
+        );
     }
-
-    mensagem += `*TOTAL FINAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-
-    const url = `https://wa.me/${CONFIG.telefoneWhatsApp}?text=${encodeURIComponent(mensagem)}`;
-    window.open(url, '_blank');
-
-    carrinho = [];
-    if (inputRua) inputRua.value = '';
-    if (inputNumero) inputNumero.value = '';
-    if (inputReferencia) inputReferencia.value = '';
-    atualizarCarrinho();
 };
 
 function verificarHorarioFuncionamento() {

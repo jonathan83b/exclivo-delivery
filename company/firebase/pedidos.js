@@ -1,76 +1,175 @@
 import { db } from './firebase-config.js';
-import { 
-    collection, 
-    addDoc, 
-    getDocs, 
-    doc, 
-    updateDoc, 
-    query, 
-    orderBy, 
-    onSnapshot 
+
+import {
+    collection,
+    addDoc,
+    getDocs,
+    doc,
+    updateDoc,
+    query,
+    where,
+    orderBy,
+    onSnapshot,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const COLECAO_PEDIDOS = 'pedidos';
+const COLECAO_PEDIDOS = "pedidos";
 
 /**
- * Cria um novo pedido no Firestore
+ * Cria um novo pedido
  */
 export async function criarPedido(novoPedido) {
     try {
-        const docRef = await addDoc(collection(db, COLECAO_PEDIDOS), novoPedido);
-        return { success: true, id: docRef.id };
-    } catch (e) {
-        console.error("Erro ao criar pedido no Firestore:", e);
-        return { success: false, error: e };
+
+        const pedidoCompleto = {
+            ...novoPedido,
+            dataCriacao: serverTimestamp()
+        };
+
+        const docRef = await addDoc(
+            collection(db, COLECAO_PEDIDOS),
+            pedidoCompleto
+        );
+
+        console.log("Pedido criado:", docRef.id);
+
+        return {
+            success: true,
+            id: docRef.id
+        };
+
+    } catch (erro) {
+
+        console.error("Erro ao criar pedido:", erro);
+
+        return {
+            success: false,
+            error: erro
+        };
     }
 }
 
+
 /**
- * Busca todos os pedidos uma única vez
+ * Busca pedidos de uma empresa
  */
-export async function buscarPedidos() {
+export async function buscarPedidos(restaurantId) {
+
     try {
-        const q = query(collection(db, COLECAO_PEDIDOS), orderBy('dataCriacao', 'desc'));
-        const querySnapshot = await getDocs(q);
+
+        const q = query(
+            collection(db, COLECAO_PEDIDOS),
+            where("restaurantId", "==", restaurantId),
+            orderBy("dataCriacao", "desc")
+        );
+
+        const resultado = await getDocs(q);
+
         const pedidos = [];
-        querySnapshot.forEach((docSnap) => {
-            pedidos.push({ idDoc: docSnap.id, ...docSnap.data() });
+
+        resultado.forEach((documento) => {
+
+            pedidos.push({
+                idDoc: documento.id,
+                ...documento.data()
+            });
+
         });
+
         return pedidos;
-    } catch (e) {
-        console.error("Erro ao buscar pedidos:", e);
+
+    } catch (erro) {
+
+        console.error("Erro ao buscar pedidos:", erro);
+
         return [];
     }
 }
 
-/**
- * Ouve alterações em tempo real nos pedidos para atualizar a cozinha instantaneamente
- */
-export function escutarPedidosEmTempoReal(callback) {
-    const q = query(collection(db, COLECAO_PEDIDOS), orderBy('dataCriacao', 'desc'));
-    return onSnapshot(q, (querySnapshot) => {
-        const pedidos = [];
-        querySnapshot.forEach((docSnap) => {
-            pedidos.push({ idDoc: docSnap.id, ...docSnap.data() });
-        });
-        callback(pedidos);
-    });
-}
 
 /**
- * Atualiza o status de um pedido específico no Firestore
+ * Escuta pedidos em tempo real
  */
-export async function atualizarStatusPedido(idDoc, novoStatus, motivo = '') {
+export function escutarPedidosEmTempoReal(
+    restaurantId,
+    callback
+) {
+
+    const q = query(
+        collection(db, COLECAO_PEDIDOS),
+        where("restaurantId", "==", restaurantId),
+        orderBy("dataCriacao", "desc")
+    );
+
+    return onSnapshot(
+        q,
+        (snapshot) => {
+
+            const pedidos = [];
+
+            snapshot.forEach((documento) => {
+
+                pedidos.push({
+                    idDoc: documento.id,
+                    ...documento.data()
+                });
+
+            });
+
+            callback(pedidos);
+        },
+
+        (erro) => {
+
+            console.error(
+                "Erro no monitoramento dos pedidos:",
+                erro
+            );
+
+        }
+    );
+}
+
+
+/**
+ * Atualiza o status do pedido
+ */
+export async function atualizarStatusPedido(
+    idDoc,
+    novoStatus,
+    motivo = ""
+) {
+
     try {
-        const pedidoRef = doc(db, COLECAO_PEDIDOS, idDoc);
-        const dadosAtualizados = { status: novoStatus };
+
+        const pedidoRef = doc(
+            db,
+            COLECAO_PEDIDOS,
+            idDoc
+        );
+
+        const dadosAtualizados = {
+            status: novoStatus
+        };
+
         if (motivo) {
             dadosAtualizados.motivoCancelamento = motivo;
         }
-        await updateDoc(pedidoRef, dadosAtualizados);
+
+        await updateDoc(
+            pedidoRef,
+            dadosAtualizados
+        );
+
         return true;
-    } catch (e) {
-        console.error("Erro ao atualizar status:", e);
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao atualizar status:",
+            erro
+        );
+
         return false;
     }
 }
