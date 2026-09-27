@@ -347,169 +347,49 @@ window.fazerPedido = async function() {
         status: "pendente"
 
     };
-
-
-    /*
-     * ENVIA PARA FIREBASE
-     */
-
-    console.log(
-        "Enviando pedido para o Firestore...",
-        novoPedido
-    );
-
-
+    // ENVIA O PEDIDO PARA O FIRESTORE
     try {
-
-        const resultado =
-            await criarPedido(novoPedido);
-
-
-        if (!resultado.success) {
-
-            console.error(
-                "Falha ao salvar pedido:",
-                resultado.error
-            );
-
-
-            alert(
-                'Não foi possível enviar o pedido. Tente novamente.'
-            );
-
-            return;
-        }
-
-
-        console.log(
-            "Pedido salvo no Firestore:",
-            resultado.id
-        );
-
-
-        /*
-         * WHATSAPP
-         */
-
-        let mensagem =
-            `*NOVO PEDIDO ${numeroPedido} - EXCLIVO DELIVERY*\n\n`;
-
-
-        mensagem +=
-            "*Itens do Pedido:*\n";
-
-
-        carrinho.forEach(item => {
-
-            mensagem +=
-                `• ${item.quantidade}x ${item.nome} - R$ ` +
-                `${(
-                    item.preco *
-                    item.quantidade
-                )
-                .toFixed(2)
-                .replace('.', ',')}\n`;
-
-        });
-
-
-        mensagem +=
-            `\n*Subtotal:* R$ ` +
-            `${subtotalProdutos
-                .toFixed(2)
-                .replace('.', ',')}`;
-
-
-        mensagem +=
-            `\n*Entrega (${nomeBairro}):* R$ ` +
-            `${valorTaxa
-                .toFixed(2)
-                .replace('.', ',')}`;
-
-
-        if (precisaEntrega) {
-
-            mensagem +=
-                `\n📍 *Rua:* ${rua}`;
-
-            mensagem +=
-                `\n🏠 *Número:* ${numero}`;
-
-
-            if (referencia) {
-
-                mensagem +=
-                    `\n🚩 *Referência:* ${referencia}`;
-            }
-
-        } else {
-
-            mensagem +=
-                `\n📍 *Opção:* Retirada no local`;
-        }
-
-
-        mensagem +=
-            `\n*TOTAL FINAL:* R$ ` +
-            `${totalGeral
-                .toFixed(2)
-                .replace('.', ',')}`;
-
-
-        const url =
-            `https://wa.me/${CONFIG.telefoneWhatsApp}` +
-            `?text=${encodeURIComponent(mensagem)}`;
-
-
-        window.open(
-            url,
-            '_blank'
-        );
-
-
-        /*
-         * LIMPA O CARRINHO
-         */
-
-        carrinho = [];
-
-
-        if (inputRua) {
-            inputRua.value = '';
-        }
-
-
-        if (inputNumero) {
-            inputNumero.value = '';
-        }
-
-
-        if (inputReferencia) {
-            inputReferencia.value = '';
-        }
-
-
-        atualizarCarrinho();
-
-
-        alert(
-            `Pedido ${numeroPedido} enviado com sucesso!`
-        );
-
-
-    } catch (erro) {
-
-        console.error(
-            "Erro inesperado ao fazer pedido:",
-            erro
-        );
-
-
-        alert(
-            'Ocorreu um erro ao enviar o pedido.'
-        );
+        await criarPedido(novoPedido);
+    } catch (e) {
+        console.error("Erro ao enviar pedido para o Firestore:", e);
     }
+
+    // MENSAGEM DO WHATSAPP
+    let mensagem = `*NOVO PEDIDO ${novoPedido.id} - EXCLIVO DELIVERY*\n\n`;
+    mensagem += "*Itens do Pedido:*\n";
+
+    carrinho.forEach(item => {
+        mensagem += `• ${item.quantidade}x ${item.nome} - R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}\n`;
+    });
+
+    mensagem += `\n*Subtotal:* R$ ${subtotalProdutos.toFixed(2).replace('.', ',')}\n`;
+    mensagem += `*Entrega (${nomeBairro}):* R$ ${valorTaxa.toFixed(2).replace('.', ',')}\n`;
+    
+    if (precisaEntrega) {
+        mensagem += `📍 *Rua:* ${rua}\n`;
+        mensagem += `🏠 *Número:* ${numero}\n`;
+        if (referencia) {
+            mensagem += `🚩 *Ref/Comp:* ${referencia}\n`;
+        }
+    } else {
+        mensagem += `📍 *Opção:* Retirada no local\n`;
+    }
+
+    mensagem += `*TOTAL FINAL:* R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+
+    const url = `https://wa.me/${CONFIG.telefoneWhatsApp}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
+
+    // === LIMPEZA CORRETA DO CARRINHO E DA INTERFACE ===
+    carrinho = [];
+    if (inputRua) inputRua.value = '';
+    if (inputNumero) inputNumero.value = '';
+    if (inputReferencia) inputReferencia.value = '';
+    
+    // Força a atualização visual da caixa do carrinho para "Nenhum produto adicionado"
+    window.atualizarCarrinho();
 };
+
 
 function verificarHorarioFuncionamento() {
     const statusElemento = document.getElementById('status-loja');
