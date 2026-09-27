@@ -213,7 +213,6 @@ window.fazerPedido = async function() {
     };
 
     // GUARDA OS PEDIDOS NO LOCALSTORAGE (CHAVE UNIFICADA)
-    try {
       const resultado = await criarPedido(novoPedido);
 
     if (!resultado.success) {
@@ -222,7 +221,7 @@ window.fazerPedido = async function() {
     }
 
     console.log('Pedido salvo no Firestore:', resultado.id);
-    }
+    
 
     // MENSAGEM DO WHATSAPP
     let mensagem = `*NOVO PEDIDO ${novoPedido.id} - EXCLIVO DELIVERY*\n\n`;
