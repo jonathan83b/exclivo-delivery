@@ -213,14 +213,14 @@ window.fazerPedido = async function() {
     };
 
     // GUARDA OS PEDIDOS NO LOCALSTORAGE (CHAVE UNIFICADA)
-      const resultado = await criarPedido(novoPedido);
+    const resultado = await criarPedido(novoPedido);
 
-    if (!resultado.success) {
+if (!resultado.success) {
     alert('Não foi possível enviar o pedido. Tente novamente.');
     return;
-    }
+}
 
-    console.log('Pedido salvo no Firestore:', resultado.id);
+console.log('Pedido salvo no Firestore:', resultado.id);
     
 
     // MENSAGEM DO WHATSAPP
