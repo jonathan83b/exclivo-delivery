@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Cardápio - Exclivo</title>
     <link rel="stylesheet" href="css/admin.css">
-     <link rel="stylesheet" href="css/gerenciar-cardapio.css">
-     <link rel="icon" href="img/favcompizza.png" type="image/png">
+    <link rel="stylesheet" href="css/gerenciar-cardapio.css">
+    <link rel="icon" href="img/favcompizza.png" type="image/png">
 </head>
 
 <body>
@@ -17,7 +17,7 @@
         <div class="admin-actions">
             <a href="admin.html" class="btn-site">📦 Ir para Pedidos</a>
             <a href="index.html" class="btn-site" target="_blank">🍕 Ver Cardápio</a>
-            <button style="background: #64748b; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="fazerLogout()">🚪 Sair</button>
+            <button style="background: #64748b; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="window.fazerLogout()">🚪 Sair</button>
         </div>
     </header>
 
@@ -29,7 +29,7 @@
             <div class="card-form">
                 <h3 id="form-titulo">➕ Cadastrar Novo Item</h3>
                 
-                <form id="form-produto" onsubmit="salvarProduto(event)">
+                <form id="form-produto" onsubmit="window.salvarProduto(event)">
                     <input type="hidden" id="prod-id">
 
                     <div class="form-group">
@@ -67,7 +67,7 @@
                     </div>
 
                     <button type="submit" class="btn-save" id="btn-submit">Salvar Produto</button>
-                    <button type="button" class="btn-cancel" id="btn-cancel" onclick="cancelarEdicao()">Cancelar Edição</button>
+                    <button type="button" class="btn-cancel" id="btn-cancel" onclick="window.cancelarEdicao()">Cancelar Edição</button>
                 </form>
             </div>
 
@@ -96,7 +96,8 @@
 
     </main>
 
-    <script src="js/gerenciar-cardapio.js"></script>
+    <!-- Alterado para type="module" para suportar importações do Firebase se necessário -->
+    <script type="module" src="js/gerenciar-cardapio.js"></script>
 </body>
 
 </html>

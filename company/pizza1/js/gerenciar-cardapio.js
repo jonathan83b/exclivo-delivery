@@ -52,17 +52,17 @@ function renderizarTabela() {
 
         tr.innerHTML = `
             <td>
-                <button class="btn-action btn-move" onclick="moverItem(${index}, -1)">▲</button>
-                <button class="btn-action btn-move" onclick="moverItem(${index}, 1)">▼</button>
+                <button type="button" class="btn-action btn-move" onclick="window.moverItem(${index}, -1)">▲</button>
+                <button type="button" class="btn-action btn-move" onclick="window.moverItem(${index}, 1)">▼</button>
             </td>
             <td><strong>${item.nome}</strong><br><small style="color:#64748b;">${item.descricao || ''}</small></td>
             <td><span class="badge-cat">${catNome}</span></td>
             <td>R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</td>
             <td>${statusHTML}</td>
             <td>
-                <button class="btn-action btn-edit" onclick="editarItem('${item.id}')">✏️ Editar</button>
-                <button class="btn-action btn-toggle" onclick="alternarStatus('${item.id}')">👁️ Visibilidade</button>
-                <button class="btn-action btn-delete" onclick="excluirItem('${item.id}')">🗑️ Excluir</button>
+                <button type="button" class="btn-action btn-edit" onclick="window.editarItem('${item.id}')">✏️ Editar</button>
+                <button type="button" class="btn-action btn-toggle" onclick="window.alternarStatus('${item.id}')">👁️ Visibilidade</button>
+                <button type="button" class="btn-action btn-delete" onclick="window.excluirItem('${item.id}')">🗑️ Excluir</button>
             </td>
         `;
 
@@ -83,13 +83,11 @@ window.salvarProduto = function(event) {
     let cardapio = obterCardapio();
 
     if (id) {
-        // Atualização de item existente
         const index = cardapio.findIndex(p => p.id === id);
         if (index !== -1) {
             cardapio[index] = { ...cardapio[index], nome, categoria, preco, tipoOpcao, descricao };
         }
     } else {
-        // Criação de novo item
         const novoItem = {
             id: Date.now().toString(),
             nome,
@@ -103,7 +101,7 @@ window.salvarProduto = function(event) {
     }
 
     salvarCardapio(cardapio);
-    cancelarEdicao();
+    window.cancelarEdicao();
 };
 
 window.editarItem = function(id) {
