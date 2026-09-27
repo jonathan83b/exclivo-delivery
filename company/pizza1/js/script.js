@@ -1,3 +1,4 @@
+import { criarPedido } from '../../firebase/pedidos.js';
 // CONFIGURAÇÕES DO RESTAURANTE
 const CONFIG = {
     telefoneWhatsApp: "5585987608107", 
@@ -138,7 +139,7 @@ window.atualizarCarrinho = function() {
     elementoTotal.textContent = totalGeral.toFixed(2).replace('.', ',');
 };
 
-window.fazerPedido = function() {
+window.fazerPedido = async function() {
     if (carrinho.length === 0) {
         alert('Seu carrinho está vazio. Adicione pelo menos um item!');
         return;
@@ -196,6 +197,8 @@ window.fazerPedido = function() {
 
     const novoPedido = {
         id: "#" + Math.floor(1000 + Math.random() * 9000),
+        restaurantId: "pizza1",
+        dataCriacao: Date.now(),
         dataHora: new Date().toLocaleString('pt-BR'),
         itens: itensFormatados,
         subtotal: subtotalProdutos,
@@ -211,11 +214,14 @@ window.fazerPedido = function() {
 
     // GUARDA OS PEDIDOS NO LOCALSTORAGE (CHAVE UNIFICADA)
     try {
-        const pedidosExistentes = JSON.parse(localStorage.getItem('exclivo_pedidos') || '[]');
-        pedidosExistentes.unshift(novoPedido);
-        localStorage.setItem('exclivo_pedidos', JSON.stringify(pedidosExistentes));
-    } catch (e) {
-        console.error("Erro ao salvar no LocalStorage:", e);
+      const resultado = await criarPedido(novoPedido);
+
+    if (!resultado.success) {
+    alert('Não foi possível enviar o pedido. Tente novamente.');
+    return;
+    }
+
+    console.log('Pedido salvo no Firestore:', resultado.id);
     }
 
     // MENSAGEM DO WHATSAPP

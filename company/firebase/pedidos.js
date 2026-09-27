@@ -10,7 +10,7 @@ import {
     onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const COLECAO_PEDIDOS = 'pizza1_pedidos';
+const COLECAO_PEDIDOS = 'pedidos';
 
 /**
  * Cria um novo pedido no Firestore
